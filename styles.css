@@ -1,0 +1,17 @@
+body {
+  background-color: #f0f8ff;      /* Light blue background */
+  color: #222222;                 /* Dark text */
+}
+
+h1 {
+  color: #2b7a78;                 /* Teal heading */
+}
+
+a {
+  color: #3a86ff;                 /* Blue links */
+  text-decoration: none;
+}
+
+a:hover {
+  color: #ff006e;                 /* Pink on hover */
+}

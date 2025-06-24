@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const path = require("path")
 const fastify = require("fastify")({ logger: true })
 const fastifyStatic = require("@fastify/static")
