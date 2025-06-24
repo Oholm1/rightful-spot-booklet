@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <meta charset="UTF-8" />
   <title>Encryption Engine Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -33,4 +33,28 @@
   <h1>🧠 Encryption Engine Status</h1>
   <div class="stat"><span class="label">🧵 Threads:</span> <span id="threads" class="value">-</span></div>
   <div class="stat"><span class="label">💤 Idle Threads:</span> <span id="idleThreads" class="value">-</span></div>
-  <div class="stat
+  <div class="stat"><span class="label">⚙️ Utilization:</span> <span id="utilization" class="value">-</span></div>
+  <div class="stat"><span class="label">📚 Queue Size:</span> <span id="queueSize" class="value">-</span></div>
+  <div class="stat"><span class="label">📈 Utilization Graph:</span></div>
+  <canvas id="utilChart" width="600" height="300"></canvas>
+
+  <script>
+    const ctx = document.getElementById('utilChart').getContext('2d');
+    const utilData = {
+      labels: [],
+      datasets: [{
+        label: 'Utilization (%)',
+        borderColor: '#0f0',
+        backgroundColor: 'transparent',
+        data: [],
+        tension: 0.3
+      }]
+    };
+
+    const utilChart = new Chart(ctx, {
+      type: 'line',
+      data: utilData,
+      options: {
+        responsive: true,
+        animation: false,
+        scales: {
