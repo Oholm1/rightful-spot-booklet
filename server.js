@@ -39,6 +39,7 @@ fastify.get("/status", async (request, reply) => {
   };
 });
 
+
 // Route: Encryption
 fastify.post("/encrypt", async (request, reply) => {
   const { data, password } = request.body;
@@ -70,4 +71,14 @@ fastify.post("/encrypt", async (request, reply) => {
 // Start the server
 const start = async () => {
   try {
-    await fastify.listen(process.env.PORT
+    await fastify.listen(process.env.PORT || 3000, "0.0.0.0");
+    console.log("✅ Server is live at http://0.0.0.0:3000");
+  } catch (err) {
+    console.error("❌ Failed to start server:", err);
+    process.exit(1);
+  }
+};
+
+start(); // ← don't forget to invoke the start function!
+
+
