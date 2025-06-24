@@ -5,7 +5,7 @@ const fastifyStatic = require("@fastify/static");
 
 // Serve static files from project root
 fastify.register(fastifyStatic, {
-  root: path.join(__dirname),
+root: path.join(__dirname, "public"),
   prefix: "/",
 });
 

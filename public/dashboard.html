@@ -38,23 +38,73 @@
   <div class="stat"><span class="label">📈 Utilization Graph:</span></div>
   <canvas id="utilChart" width="600" height="300"></canvas>
 
-  <script>
-    const ctx = document.getElementById('utilChart').getContext('2d');
-    const utilData = {
-      labels: [],
-      datasets: [{
-        label: 'Utilization (%)',
-        borderColor: '#0f0',
-        backgroundColor: 'transparent',
-        data: [],
-        tension: 0.3
-      }]
-    };
+<script>
+  const ctx = document.getElementById('utilChart').getContext('2d');
+  const utilData = {
+    labels: [],
+    datasets: [{
+      label: 'Utilization (%)',
+      borderColor: '#0f0',
+      backgroundColor: 'transparent',
+      data: [],
+      tension: 0.3
+    }]
+  };
 
-    const utilChart = new Chart(ctx, {
-      type: 'line',
-      data: utilData,
-      options: {
-        responsive: true,
-        animation: false,
-        scales: {
+  const utilChart = new Chart(ctx, {
+    type: 'line',
+    data: utilData,
+    options: {
+      responsive: true,
+      animation: false,
+      scales: {
+        y: {
+          min: 0,
+          max: 100,
+          ticks: {
+            color: '#888'
+          }
+        },
+        x: {
+          ticks: {
+            color: '#888'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: '#0f0'
+          }
+        }
+      }
+    }
+  });
+
+  async function fetchStatus() {
+    try {
+      const res = await fetch("/status");
+      const data = await res.json();
+
+      document.getElementById("threads").textContent = data.threads;
+      document.getElementById("idleThreads").textContent = data.idleThreads;
+      document.getElementById("utilization").textContent = (data.utilization * 100).toFixed(1) + "%";
+      document.getElementById("queueSize").textContent = data.queueSize;
+
+      const now = new Date().toLocaleTimeString();
+      if (utilData.labels.length > 30) {
+        utilData.labels.shift();
+        utilData.datasets[0].data.shift();
+      }
+
+      utilData.labels.push(now);
+      utilData.datasets[0].data.push((data.utilization * 100).toFixed(1));
+      utilChart.update();
+    } catch (err) {
+      console.error("Failed to fetch status:", err);
+    }
+  }
+
+  fetchStatus();
+  setInterval(fetchStatus, 2000);
+</script>
