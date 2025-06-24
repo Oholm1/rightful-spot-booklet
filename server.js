@@ -19,7 +19,12 @@ fastify.get("/about", (request, reply) => {
   reply.sendFile("about.html");
 });
 
-// ✅ Route: Engine status for dashboard
+// Route: Dashboard page
+fastify.get("/dashboard.html", (request, reply) => {
+  reply.sendFile("dashboard.html");
+});
+
+// Route: Engine status for dashboard
 fastify.get("/status", async (request, reply) => {
   const threads = 8;
   const idleThreads = 5;
@@ -35,7 +40,7 @@ fastify.get("/status", async (request, reply) => {
 });
 
 // Route: Encryption
-fastify.post("/encrypt", (request, reply) => {
+fastify.post("/encrypt", async (request, reply) => {
   const { data, password } = request.body;
 
   if (!data || !password) {
@@ -56,4 +61,13 @@ fastify.post("/encrypt", (request, reply) => {
       algorithm: "aes-256-cbc",
     });
   } catch (err) {
-    return reply.status(500).send({ error: "Encryption failed", detail: err.message });
+    return reply
+      .status(500)
+      .send({ error: "Encryption failed", detail: err.message });
+  }
+});
+
+// Start the server
+const start = async () => {
+  try {
+    await fastify.listen(process.env.PORT
