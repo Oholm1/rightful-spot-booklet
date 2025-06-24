@@ -172,6 +172,11 @@
       document.getElementById("idleThreads").textContent = data.idleThreads;
       document.getElementById("utilization").textContent = (data.utilization * 100).toFixed(1) + "%";
       document.getElementById("queueSize").textContent = data.queueSize;
+      const activeThreads = Math.max(data.threads - data.idleThreads, 1);
+      const avgTaskTime = 2; // seconds per task (you can adjust this)
+      const estimatedWait = Math.ceil((data.queueSize / activeThreads) * avgTaskTime);
+
+      document.getElementById("waitTime").textContent = estimatedWait + " sec";
 
       const now = new Date().toLocaleTimeString();
 
