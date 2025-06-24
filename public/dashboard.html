@@ -81,34 +81,80 @@
     }
   });
 
-  async function fetchStatus() {
-    try {
-      const res = await fetch("/status");
-      const data = await res.json();
+async function fetchStatus () {
+  try {
+    const res = await fetch("/status");
+    const data = await res.json();
 
-      document.getElementById("threads").textContent = data.threads;
-      document.getElementById("idleThreads").textContent = data.idleThreads;
-      document.getElementById("utilization").textContent = (data.utilization * 100).toFixed(1) + "%";
-      document.getElementById("queueSize").textContent = data.queueSize;
+    // Update the UI
+    document.getElementById("threads").textContent = data.threads;
+    document.getElementById("idleThreads").textContent = data.idleThreads;
+    document.getElementById("utilization").textContent = (data.utilization * 100).toFixed(1) + "%";
+    document.getElementById("queueSize").textContent = data.queueSize;
 
-      const now = new Date().toLocaleTimeString();
-      if (utilData.labels.length > 30) {
-        utilData.labels.shift();
-        utilData.datasets[0].data.shift();
-      }
-
-      utilData.labels.push(now);
-      utilData.datasets[0].data.push((data.utilization * 100).toFixed(1));
-      utilChart.update();
-    } catch (err) {
-      console.error("Failed to fetch status:", err);
+    // Chart update
+    const now = new Date().toLocaleTimeString();
+    if (utilData.labels.length > 30) {
+      utilData.labels.shift();
+      utilData.datasets[0].data.shift();
     }
+    utilData.labels.push(now);
+    utilData.datasets[0].data.push((data.utilization * 100).toFixed(1));
+    utilChart.update();
+
+    // 💬 Show toast only on success
+    showToast();
+  } catch (err) {
+    console.error("Failed to fetch status:", err);
   }
+}
 
   fetchStatus();
+  showToast();
   setInterval(fetchStatus, 2000);
 </script>
 <script>
   console.log("🚀 Hello from JavaScript!");
   alert("JavaScript is working!");
+</script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script>
+  // Fire confetti on load!
+  window.addEventListener("load", () => {
+    confetti({
+      particleCount: 120,
+      spread: 80,
+      origin: { y: 0.6 }
+    });
+
+    console.log("🎉 Welcome back! Encryption Engine is online.");
+  });
+</script>
+<style>
+  #toast {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background-color: #0f0;
+    color: #000;
+    padding: 0.8rem 1.2rem;
+    border-radius: 6px;
+    font-weight: bold;
+    box-shadow: 0 0 10px #0f05;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+</style>
+
+<div id="toast">🟢 Live — engine status is green</div>
+
+<script>
+  function showToast() {
+    const toast = document.getElementById("toast");
+    toast.style.opacity = 1;
+    setTimeout(() => {
+      toast.style.opacity = 0;
+    }, 3000);
+  }
 </script>
