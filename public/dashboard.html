@@ -129,32 +129,77 @@ async function fetchStatus () {
 
     console.log("🎉 Welcome back! Encryption Engine is online.");
   });
-</script>
+<div id="toast"></div>
 <style>
   #toast {
     position: fixed;
     top: 1rem;
     right: 1rem;
-    background-color: #0f0;
-    color: #000;
     padding: 0.8rem 1.2rem;
     border-radius: 6px;
     font-weight: bold;
-    box-shadow: 0 0 10px #0f05;
+    box-shadow: 0 0 10px #0005;
     z-index: 9999;
     opacity: 0;
     transition: opacity 0.4s ease;
   }
 </style>
 
+
 <div id="toast">🟢 Live — engine status is green</div>
 
 <script>
-  function showToast() {
+  function showToast(utilization) {
     const toast = document.getElementById("toast");
+
+    let bg = "#0f0"; // default green
+    let text = "🟢 Live — Engine is healthy";
+
+    if (utilization >= 90) {
+      bg = "#f00";
+      text = "🔴 Warning — Utilization critical!";
+    } else if (utilization >= 70) {
+      bg = "#ff0";
+      text = "🟡 Caution — High load";
+    }
+
+    toast.style.backgroundColor = bg;
+    toast.style.color = utilization >= 70 ? "#000" : "#111";
+    toast.textContent = text;
     toast.style.opacity = 1;
+
     setTimeout(() => {
       toast.style.opacity = 0;
     }, 3000);
   }
+
+  async function fetchStatus() {
+    try {
+      const res = await fetch("/status");
+      const data = await res.json();
+
+      document.getElementById("threads").textContent = data.threads;
+      document.getElementById("idleThreads").textContent = data.idleThreads;
+      document.getElementById("utilization").textContent = (data.utilization * 100).toFixed(1) + "%";
+      document.getElementById("queueSize").textContent = data.queueSize;
+
+      const now = new Date().toLocaleTimeString();
+      if (utilData.labels.length > 30) {
+        utilData.labels.shift();
+        utilData.datasets[0].data.shift();
+      }
+
+      utilData.labels.push(now);
+      utilData.datasets[0].data.push((data.utilization * 100).toFixed(1));
+      utilChart.update();
+
+      // 🧃 Show the toast after successful update
+      showToast(data.utilization * 100);
+    } catch (err) {
+      console.error("Failed to fetch status:", err);
+    }
+  }
+
+  fetchStatus();
+  setInterval(fetchStatus, 2000);
 </script>
