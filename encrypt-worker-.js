@@ -24,3 +24,12 @@ fastify.post("/encrypt", async (request, reply) => {
     reply.status(500).send({ error: "Encryption failed", detail: err.message });
   }
 });
+fastify.get("/status", async (request, reply) => {
+  reply.send({
+    threads: pool.threads.length,
+    utilization: pool.utilization,
+    queueSize: pool.queueSize,
+    maxThreads: pool.options.maxThreads,
+    idleThreads: pool.threads.filter(t => !t.task).length
+  });
+});

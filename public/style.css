@@ -200,3 +200,35 @@ label {
 h2 {
   color: var(--color-text-header);
 }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Encryption Engine Status</title>
+  <style>
+    body { font-family: sans-serif; background: #111; color: #eee; padding: 2rem; }
+    .stat { margin-bottom: 1rem; font-size: 1.25rem; }
+    .label { color: #888; }
+    .value { font-weight: bold; color: #0f0; }
+  </style>
+</head>
+<body>
+  <h1>🧠 Encryption Engine Status</h1>
+  <div class="stat">🧵 Threads: <span id="threads" class="value"></span></div>
+  <div class="stat">⚙️ Utilization: <span id="utilization" class="value"></span></div>
+  <div class="stat">📚 Queue Size: <span id="queueSize" class="value"></span></div>
+  <div class="stat">💤 Idle Threads: <span id="idleThreads" class="value"></span></div>
+  <script>
+    async function fetchStatus() {
+      const res = await fetch("/status");
+      const data = await res.json();
+      document.getElementById("threads").textContent = data.threads;
+      document.getElementById("utilization").textContent = (data.utilization * 100).toFixed(1) + "%";
+      document.getElementById("queueSize").textContent = data.queueSize;
+      document.getElementById("idleThreads").textContent = data.idleThreads;
+    }
+    fetchStatus();
+    setInterval(fetchStatus, 2000);
+  </script>
+</body>
+</html>

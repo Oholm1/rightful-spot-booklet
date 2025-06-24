@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8" />
+  <title>Encryption Engine Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: #e0e0e0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    h1 {
+      color: #00ff99;
+      margin-bottom: 1.5rem;
+    }
+    .stat {
+      margin-bottom: 1rem;
+    }
+    .label {
+      color: #888;
+      font-weight: bold;
+      margin-right: 0.5rem;
+    }
+    .value {
+      color: #0f0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧠 Encryption Engine Status</h1>
+  <div class="stat"><span class="label">🧵 Threads:</span> <span id="threads" class="value">-</span></div>
+  <div class="stat"><span class="label">💤 Idle Threads:</span> <span id="idleThreads" class="value">-</span></div>
+  <div class="stat
