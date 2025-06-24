@@ -56,4 +56,4 @@ fastify.post("/encrypt", (request, reply) => {
       algorithm: "aes-256-cbc",
     });
   } catch (err) {
-    return reply.status(500).
+    return reply.status(500).send({ error: "Encryption failed", detail: err.message });
