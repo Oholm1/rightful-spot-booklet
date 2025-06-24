@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Encryption Engine Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -27,6 +28,18 @@
     .value {
       color: #0f0;
     }
+    #toast {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.8rem 1.2rem;
+      border-radius: 6px;
+      font-weight: bold;
+      box-shadow: 0 0 10px #0005;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
   </style>
 </head>
 <body>
@@ -38,129 +51,44 @@
   <div class="stat"><span class="label">📈 Utilization Graph:</span></div>
   <canvas id="utilChart" width="600" height="300"></canvas>
 
-<script>
-  const ctx = document.getElementById('utilChart').getContext('2d');
-  const utilData = {
-    labels: [],
-    datasets: [{
-      label: 'Utilization (%)',
-      borderColor: '#0f0',
-      backgroundColor: 'transparent',
-      data: [],
-      tension: 0.3
-    }]
-  };
+  <div id="toast"></div>
+  <div id="toast"></div>
 
-  const utilChart = new Chart(ctx, {
-    type: 'line',
-    data: utilData,
-    options: {
-      responsive: true,
-      animation: false,
-      scales: {
-        y: {
-          min: 0,
-          max: 100,
-          ticks: {
-            color: '#888'
-          }
-        },
-        x: {
-          ticks: {
-            color: '#888'
-          }
-        }
-      },
-      plugins: {
-        legend: {
-          labels: {
-            color: '#0f0'
-          }
-        }
-      }
-    }
-  });
+  <div class="stat"><span class="label">🧵 Threads:</span> <span id="threads">-</span></div>
+  <div class="stat"><span class="label">💤 Idle Threads:</span> <span id="idleThreads">-</span></div>
+  <div class="stat"><span class="label">⚙️ Utilization:</span> <span id="utilization">-</span></div>
+  <div class="stat"><span class="label">📚 Queue Size:</span> <span id="queueSize">-</span></div>
 
-async function fetchStatus () {
-  try {
-    const res = await fetch("/status");
-    const data = await res.json();
+<canvas id="utilChart" width="600" height="300"></canvas>
+<div class="stat"><span class="label">🌀 Queue Size Graph:</span></div>
+<canvas id="queueChart" width="600" height="300"></canvas>
 
-    // Update the UI
-    document.getElementById("threads").textContent = data.threads;
-    document.getElementById("idleThreads").textContent = data.idleThreads;
-    document.getElementById("utilization").textContent = (data.utilization * 100).toFixed(1) + "%";
-    document.getElementById("queueSize").textContent = data.queueSize;
-
-    // Chart update
-    const now = new Date().toLocaleTimeString();
-    if (utilData.labels.length > 30) {
-      utilData.labels.shift();
-      utilData.datasets[0].data.shift();
-    }
-    utilData.labels.push(now);
-    utilData.datasets[0].data.push((data.utilization * 100).toFixed(1));
-    utilChart.update();
-
-    // 💬 Show toast only on success
-    showToast();
-  } catch (err) {
-    console.error("Failed to fetch status:", err);
-  }
-}
-
-  fetchStatus();
-  showToast();
-  setInterval(fetchStatus, 2000);
-</script>
-<script>
-  console.log("🚀 Hello from JavaScript!");
-  alert("JavaScript is working!");
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 <script>
-  // Fire confetti on load!
+  // 🎉 Confetti on load
   window.addEventListener("load", () => {
     confetti({
       particleCount: 120,
       spread: 80,
       origin: { y: 0.6 }
     });
-
-    console.log("🎉 Welcome back! Encryption Engine is online.");
+    console.log("🎉 Dashboard is online!");
   });
-<div id="toast"></div>
-<style>
-  #toast {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    padding: 0.8rem 1.2rem;
-    border-radius: 6px;
-    font-weight: bold;
-    box-shadow: 0 0 10px #0005;
-    z-index: 9999;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-  }
-</style>
 
-
-<div id="toast">🟢 Live — engine status is green</div>
-
-<script>
+  // 🟢 Toast system
   function showToast(utilization) {
     const toast = document.getElementById("toast");
 
-    let bg = "#0f0"; // default green
-    let text = "🟢 Live — Engine is healthy";
+    let bg = "#0f0";
+    let text = "🟢 Engine is healthy";
 
     if (utilization >= 90) {
       bg = "#f00";
-      text = "🔴 Warning — Utilization critical!";
+      text = "🔴 Utilization critical!";
     } else if (utilization >= 70) {
       bg = "#ff0";
-      text = "🟡 Caution — High load";
+      text = "🟡 High load";
     }
 
     toast.style.backgroundColor = bg;
@@ -173,27 +101,98 @@ async function fetchStatus () {
     }, 3000);
   }
 
+  // 📈 Utilization chart setup
+  const utilCtx = document.getElementById("utilChart").getContext("2d");
+  const utilData = {
+    labels: [],
+    datasets: [{
+      label: "Utilization (%)",
+      data: [],
+      borderColor: "#0f0",
+      backgroundColor: "transparent",
+      tension: 0.3
+    }]
+  };
+  const utilChart = new Chart(utilCtx, {
+    type: "line",
+    data: utilData,
+    options: {
+      responsive: true,
+      animation: false,
+      scales: {
+        y: { min: 0, max: 100, ticks: { color: "#888" } },
+        x: { ticks: { color: "#888" } }
+      },
+      plugins: {
+        legend: {
+          labels: { color: "#0f0" }
+        }
+      }
+    }
+  });
+
+  // 📦 Queue chart setup
+  const queueCtx = document.getElementById("queueChart").getContext("2d");
+  const queueData = {
+    labels: [],
+    datasets: [{
+      label: "Queue Size",
+      data: [],
+      borderColor: "#00d0ff",
+      backgroundColor: "transparent",
+      tension: 0.3
+    }]
+  };
+  const queueChart = new Chart(queueCtx, {
+    type: "line",
+    data: queueData,
+    options: {
+      responsive: true,
+      animation: false,
+      scales: {
+        y: { beginAtZero: true, ticks: { color: "#888" } },
+        x: { ticks: { color: "#888" } }
+      },
+      plugins: {
+        legend: {
+          labels: { color: "#00d0ff" }
+        }
+      }
+    }
+  });
+
+  // 🔁 Fetch and update both charts
   async function fetchStatus() {
     try {
       const res = await fetch("/status");
       const data = await res.json();
 
+      // Update stats
       document.getElementById("threads").textContent = data.threads;
       document.getElementById("idleThreads").textContent = data.idleThreads;
       document.getElementById("utilization").textContent = (data.utilization * 100).toFixed(1) + "%";
       document.getElementById("queueSize").textContent = data.queueSize;
 
       const now = new Date().toLocaleTimeString();
+
+      // Update utilization chart
       if (utilData.labels.length > 30) {
         utilData.labels.shift();
         utilData.datasets[0].data.shift();
       }
-
       utilData.labels.push(now);
       utilData.datasets[0].data.push((data.utilization * 100).toFixed(1));
       utilChart.update();
 
-      // 🧃 Show the toast after successful update
+      // Update queue chart
+      if (queueData.labels.length > 30) {
+        queueData.labels.shift();
+        queueData.datasets[0].data.shift();
+      }
+      queueData.labels.push(now);
+      queueData.datasets[0].data.push(data.queueSize);
+      queueChart.update();
+
       showToast(data.utilization * 100);
     } catch (err) {
       console.error("Failed to fetch status:", err);
